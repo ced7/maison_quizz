@@ -22,7 +22,7 @@
             <p>Veuillez d'abord compléter le quiz.</p>
             <QuizButton 
                 Text="Retour à l'accueil" 
-                OnClick="@(() => Navigation.NavigateTo("/"))" />
+                OnClick="@(() => Navigation.NavigateTo(""))" />
         </div>
     }
     
@@ -44,6 +44,6 @@
     
     private void Recommencer()
     {
-        Navigation.NavigateTo("/", forceLoad: true);
+        Navigation.NavigateTo("", forceLoad: true);
     }
 }

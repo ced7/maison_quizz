@@ -104,7 +104,7 @@
             // Sauvegarder dans l'historique (fire and forget pour ne pas bloquer la nav)
             _ = HistoryService.AddResultAsync(resultat);
             
-            Navigation.NavigateTo("/resultats");
+            Navigation.NavigateTo("resultats");
         }
     }
 }
