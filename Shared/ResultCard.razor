@@ -1,0 +1,33 @@
+@using maison_quizz.Models
+@inject IQuizService QuizService
+
+@* Composant pour afficher le résultat final *@
+
+<div class="result-card @GetMaisonClass()">
+    <h2>Félicitations, @Resultat.Nom !</h2>
+    <h1 class="house-name">@GetMaisonNom()</h1>
+    <p class="house-description">@QuizService.GetMaisonDescription(Resultat.Maison)</p>
+    <p class="completion-info">Quiz complété le @Resultat.DateCompletion.ToString("dd/MM/yyyy à HH:mm")</p>
+</div>
+
+@code {
+    [Parameter]
+    public ResultatQuiz Resultat { get; set; } = new();
+    
+    private string GetMaisonClass()
+    {
+        return Resultat.Maison.ToString().ToLower();
+    }
+    
+    private string GetMaisonNom()
+    {
+        return Resultat.Maison switch
+        {
+            Maison.Gryffindor => "Gryffondor",
+            Maison.Slytherin => "Serpentard",
+            Maison.Ravenclaw => "Serdaigle",
+            Maison.Hufflepuff => "Poufsouffle",
+            _ => "Maison inconnue"
+        };
+    }
+}

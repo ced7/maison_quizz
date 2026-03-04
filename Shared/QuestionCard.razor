@@ -1,0 +1,37 @@
+@using maison_quizz.Models
+
+@* Composant pour afficher une question avec ses options *@
+
+<div class="question-card">
+    <h3>@Question.Texte</h3>
+    
+    <div class="options">
+        @for (int i = 0; i < Question.Options.Count; i++)
+        {
+            var index = i; // Capture de la variable pour le lambda
+            var optionId = $"option-{Question.Id}-{index}";
+            
+            <label for="@optionId">
+                <input 
+                    type="radio" 
+                    id="@optionId"
+                    name="question-@Question.Id" 
+                    value="@index"
+                    checked="@(ReponseSelectionnee == index)"
+                    @onchange="@(() => OnReponseChanged.InvokeAsync(index))" />
+                @Question.Options[index]
+            </label>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Question Question { get; set; } = new();
+    
+    [Parameter]
+    public int? ReponseSelectionnee { get; set; }
+    
+    [Parameter]
+    public EventCallback<int> OnReponseChanged { get; set; }
+}

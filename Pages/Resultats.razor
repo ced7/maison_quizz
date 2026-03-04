@@ -1,0 +1,49 @@
+@page "/resultats"
+@using maison_quizz.Models
+@inject ResultatService ResultatService
+@inject HistoryService HistoryService
+@inject NavigationManager Navigation
+
+<div class="resultats-container">
+    @if (resultat != null)
+    {
+        <ResultCard Resultat="@resultat" />
+        
+        <div class="actions">
+            <QuizButton 
+                Text="Recommencer" 
+                OnClick="Recommencer" />
+        </div>
+    }
+    else
+    {
+        <div class="no-result">
+            <h2>Aucun résultat disponible</h2>
+            <p>Veuillez d'abord compléter le quiz.</p>
+            <QuizButton 
+                Text="Retour à l'accueil" 
+                OnClick="@(() => Navigation.NavigateTo("/"))" />
+        </div>
+    }
+    
+    <HistoryList History="@history" />
+</div>
+
+@code {
+    private ResultatQuiz? resultat;
+    private List<ResultatQuiz> history = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        // Récupérer le résultat depuis le service
+        resultat = ResultatService.DernierResultat;
+        
+        // Charger l'historique
+        history = await HistoryService.GetHistoryAsync();
+    }
+    
+    private void Recommencer()
+    {
+        Navigation.NavigateTo("/", forceLoad: true);
+    }
+}

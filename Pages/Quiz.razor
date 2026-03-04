@@ -1,0 +1,110 @@
+@page "/quiz/{nom}"
+@using maison_quizz.Models
+@inject IQuizService QuizService
+@inject ResultatService ResultatService
+@inject HistoryService HistoryService
+@inject NavigationManager Navigation
+
+<div class="quiz-container">
+    @if (quiz != null && questionActuelle != null)
+    {
+        <NameDisplay Nom="@Nom" />
+        
+        <ProgressBar 
+            QuestionActuelle="@(indexQuestionActuelle + 1)" 
+            TotalQuestions="@quiz.Questions.Count" />
+        
+        <QuestionCard 
+            Question="@questionActuelle"
+            ReponseSelectionnee="@GetReponseActuelle()"
+            OnReponseChanged="@SelectionnerReponse" />
+        
+        <div class="navigation-buttons">
+            <QuizButton 
+                Text="@GetTexteBouton()" 
+                OnClick="QuestionSuivante" 
+                Disabled="@(!ReponseEstSelectionnee())" />
+        </div>
+    }
+    else
+    {
+        <p>Chargement du quiz...</p>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Nom { get; set; } = string.Empty;
+    
+    private Models.Quiz? quiz;
+    private int indexQuestionActuelle = 0;
+    private Question? questionActuelle;
+    private Dictionary<int, int> reponses = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        quiz = await QuizService.GetQuizAsync();
+        if (quiz != null && quiz.Questions.Count > 0)
+        {
+            questionActuelle = quiz.Questions[indexQuestionActuelle];
+        }
+    }
+    
+    private void SelectionnerReponse(int indexReponse)
+    {
+        if (questionActuelle != null)
+        {
+            reponses[questionActuelle.Id] = indexReponse;
+        }
+    }
+    
+    private int? GetReponseActuelle()
+    {
+        if (questionActuelle != null && reponses.ContainsKey(questionActuelle.Id))
+        {
+            return reponses[questionActuelle.Id];
+        }
+        return null;
+    }
+    
+    private bool ReponseEstSelectionnee()
+    {
+        return questionActuelle != null && reponses.ContainsKey(questionActuelle.Id);
+    }
+    
+    private string GetTexteBouton()
+    {
+        return indexQuestionActuelle < quiz!.Questions.Count - 1 ? "Suivant" : "Voir le résultat";
+    }
+    
+    private void QuestionSuivante()
+    {
+        if (quiz == null) return;
+        
+        if (indexQuestionActuelle < quiz.Questions.Count - 1)
+        {
+            indexQuestionActuelle++;
+            questionActuelle = quiz.Questions[indexQuestionActuelle];
+        }
+        else
+        {
+            // Quiz terminé, calculer le résultat
+            var maisonAttribuee = QuizService.CalculerMaison(quiz.Questions, reponses);
+            var resultat = new ResultatQuiz
+            {
+                NombreQuestions = quiz.Questions.Count,
+                Maison = maisonAttribuee,
+                Nom = Nom,
+                DateCompletion = DateTime.Now
+            };
+            
+            // Stocker le résultat dans le service et naviguer
+            ResultatService.DernierResultat = resultat;
+            
+            // Sauvegarder dans l'historique (fire and forget pour ne pas bloquer la nav)
+            _ = HistoryService.AddResultAsync(resultat);
+            
+            Navigation.NavigateTo("/resultats");
+        }
+    }
+}

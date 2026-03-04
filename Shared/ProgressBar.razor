@@ -1,0 +1,18 @@
+@* Composant de barre de progression *@
+
+<div class="progress-bar-container">
+    <p class="progress-text">Question @QuestionActuelle / @TotalQuestions</p>
+    <div class="progress-bar">
+    <div class="progress-fill" style="width: @(Pourcentage.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))%"></div>
+</div>
+</div>
+
+@code {
+    [Parameter]
+    public int QuestionActuelle { get; set; }
+    
+    [Parameter]
+    public int TotalQuestions { get; set; }
+    
+    private double Pourcentage => TotalQuestions > 0 ? (double)QuestionActuelle / TotalQuestions * 100 : 0;
+}

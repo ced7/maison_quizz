@@ -1,0 +1,117 @@
+@using maison_quizz.Models
+@inject maison_quizz.Services.IQuizService QuizService
+
+<div class="history-list">
+    <h3>Derniers résultats</h3>
+    
+    @if (History == null || !History.Any())
+    {
+        <p class="empty-history">Pas encore d'historique.</p>
+    }
+    else
+    {
+        <div class="history-grid">
+            @foreach (var result in History)
+            {
+                var maisonLower = result.Maison.ToString().ToLower();
+                var maisonClass = maisonLower;
+                
+                <div class="history-card @maisonClass">
+                    <div class="history-header">
+                        <span class="history-date">@result.DateCompletion.ToString("dd/MM/yyyy HH:mm")</span>
+                        <span class="history-name">@result.Nom</span>
+                    </div>
+                    <div class="history-body">
+                        <span class="history-house">@GetMaisonName(result.Maison)</span>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .history-list {
+        margin-top: 3rem;
+        width: 100%;
+    }
+    
+    .history-list h3 {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        color: #6c757d;
+        font-size: 1.2rem;
+    }
+    
+    .empty-history {
+        text-align: center;
+        color: #adb5bd;
+        font-style: italic;
+    }
+    
+    .history-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .history-card {
+        padding: 1rem;
+        border-radius: 8px;
+        color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .history-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .history-date {
+        font-size: 0.75rem;
+        opacity: 0.7;
+    }
+    
+    .history-name {
+        font-weight: 800;
+        font-size: 1.1rem;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    .history-house {
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-align: center;
+        display: block;
+        text-transform: uppercase;
+        margin-top: 0.5rem;
+    }
+    
+    /* House Colors */
+    .history-card.gryffindor { background: var(--gryffindor-primary); }
+    .history-card.slytherin { background: var(--slytherin-primary); }
+    .history-card.ravenclaw { background: var(--ravenclaw-primary); }
+    .history-card.hufflepuff { background: var(--hufflepuff-primary); color: black; }
+</style>
+
+@code {
+    [Parameter]
+    public List<ResultatQuiz> History { get; set; } = new();
+    
+    private string GetMaisonName(Maison maison)
+    {
+        return maison switch
+        {
+            Maison.Gryffindor => "Gryffondor",
+            Maison.Slytherin => "Serpentard",
+            Maison.Ravenclaw => "Serdaigle",
+            Maison.Hufflepuff => "Poufsouffle",
+            _ => maison.ToString()
+        };
+    }
+}

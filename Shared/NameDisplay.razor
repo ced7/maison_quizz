@@ -1,0 +1,10 @@
+@* Composant pour afficher le nom de l'utilisateur *@
+
+<div class="name-display">
+    <p>Bienvenue, <strong>@Nom</strong> !</p>
+</div>
+
+@code {
+    [Parameter]
+    public string Nom { get; set; } = string.Empty;
+}

@@ -1,0 +1,47 @@
+﻿@page "/"
+@using maison_quizz.Models
+@inject NavigationManager Navigation
+@inject HistoryService HistoryService
+
+<div class="home-container">
+    <h1>🧙‍♂️ Quelle est ta maison ? 🧙‍♀️</h1>
+    <p class="subtitle">Découvre à quelle maison de Poudlard tu appartiens !</p>
+    
+    <div class="name-input-section">
+        <label for="name">Ton nom de sorcier :</label>
+        <input 
+            type="text" 
+            id="name"
+            @bind="nom" 
+            @bind:event="oninput"
+            placeholder="Harry Potter" 
+            maxlength="50" />
+    </div>
+    
+    <div class="actions">
+        <QuizButton 
+            Text="Commencer le quiz" 
+            OnClick="StartQuiz" 
+            Disabled="@string.IsNullOrWhiteSpace(nom)" />
+    </div>
+    
+    <HistoryList History="@history" />
+</div>
+
+@code {
+    private string nom = string.Empty;
+    private List<ResultatQuiz> history = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        history = await HistoryService.GetHistoryAsync();
+    }
+
+    private void StartQuiz()
+    {
+        if (!string.IsNullOrWhiteSpace(nom))
+        {
+            Navigation.NavigateTo($"/quiz/{nom}");
+        }
+    }
+}
