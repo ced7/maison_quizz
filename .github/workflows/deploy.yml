@@ -27,6 +27,18 @@ jobs:
       - name: Change base-tag in index.html from / to maison_quizz
         run: sed -i 's/<base href="\/" \/>/<base href="\/maison_quizz\/" \/>/g' release/wwwroot/index.html
 
+      - name: Fix blazor.webassembly.js for static hosting
+        run: |
+          cd release/wwwroot/_framework
+          HASHED_FILE=$(ls blazor.webassembly.*.js | grep -v '\.gz' | grep -v '\.br' | head -n 1)
+          if [ -n "$HASHED_FILE" ]; then
+            cp "$HASHED_FILE" blazor.webassembly.js
+            echo "Copied $HASHED_FILE to blazor.webassembly.js"
+          else
+            echo "blazor.webassembly.*.js not found!"
+            exit 1
+          fi
+
       - name: Add .nojekyll file
         run: touch release/wwwroot/.nojekyll
 
